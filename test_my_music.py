@@ -7,7 +7,7 @@ import os
 #autumn_leaves = ['F# min7b5 inv2', 'B m7','E m7','E m7 inv2','A m7','D 7','G maj7', 'C maj7']
 #my_chord = mt.get_chord_info('F# min7b5 inv1')
 #mh.play_music('output.mid')
-#input_file = os.getcwd()+'\output.mid'
+
 #mh.create_music(input_file , autumn_leaves)
 #mh.create_music_chords(input_file, practice)
 #mh.play_music(input_file)
@@ -15,4 +15,8 @@ import os
 #scale = mt.explore_scale('major', 'C4', False)
 #print (scale)
 
-print(dir(mt))
+input_file = os.getcwd()+'\output.mid'
+my_list = mt.explore_scale('major', 'F#4', True,1,True)
+my_list =  mt.explore_scale('major', 'A3', True,1,True) + [mt.get_note_id('A4')]
+mh.create_music(input_file , my_list)
+mh.play_music(input_file)

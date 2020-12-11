@@ -21,7 +21,7 @@ def create_music(filename, notes):
     channel  = 0
     time     = 1    # In beats
     duration = 3    # In beats          # let the sounds ring for more than their beat value
-    tempo    = 450   # In BPM
+    tempo    = 400   # In BPM
     volume   = 100  # 0-127, as per the MIDI standard
 
     MyMIDI = MIDIFile(1)  # One track, defaults to format 1 (tempo track is created automatically)

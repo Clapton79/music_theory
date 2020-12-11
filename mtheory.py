@@ -45,10 +45,10 @@ chord_families = {
                 ,	'diminished'		    :{'scale': [2,1,2,1,2,1,2], 'degree': 1, 'family': 'diminished'}
                 ,	'inverted diminished'	:{'scale': [1,2,1,2,1,2,1], 'degree': 2, 'family': 'diminished'}
 
-                ,	'whole tone'		    :{'scale': [2,2,2,2,2],     'degree': 2, 'family': 'whole tone'}
+                ,	'whole tone'		    :{'scale': [2,2,2,2,2],     'degree': 1, 'family': 'whole tone'}
 
-                ,	'augmented'		    	:{'scale': [3,1,3,1,3,1],   'degree': 6, 'family': 'augmented'}
-                ,	'inverted augmented'	:{'scale': [1,3,1,3,1,3],   'degree': 7, 'family': 'augmented'}
+                ,	'augmented'		    	:{'scale': [3,1,3,1,3,1],   'degree': 1, 'family': 'augmented'}
+                ,	'inverted augmented'	:{'scale': [1,3,1,3,1,3],   'degree': 2, 'family': 'augmented'}
 
 }
 
@@ -233,20 +233,34 @@ def get_scale_triad(scale, base_note, ascending=True):
         triad = sorted(triad)
     return triad
 
-def explore_scale(family, base_note, alternate_sequence=True):
-    scale = []
-    ascending = True
-    base_scale=[]
+def explore_scale(family, base_note, alternate_sequence=True, starting_sequence=0, base_scale_descending=False):
+    scales = []
+    filtered_scale = []
+    base_scale = []
+    base_note_id = get_note_id(base_note)
     for i, v in chord_families.items():
         if v['family']==family:
-            print(i, v['degree'], v['scale'])
-            if v['degree']==1:
+            scales.append(v['scale'])
+            if v['degree'] == 1:
                 base_scale = v['scale']
-            if alternate_sequence == True and v['degree'] % 2 == 0:
-                ascending = False
 
-            scale.append(get_scale_triad(i, base_note,ascending))
+    #calculate base notes
+    base_scale_notes= []
+    base_scale_notes.append(base_note_id)
+    base_scale_notes_further = [base_note_id + sum(base_scale[:i+1]) for i, x in enumerate(base_scale) if i<len(base_scale)-1]
+    base_scale_notes= base_scale_notes+base_scale_notes_further
+    if base_scale_descending == True:
+        base_scale_notes = list(reversed(base_scale_notes))
+        scales = list(reversed(scales))
 
-    return scale
+    for i,a in enumerate(scales):
+        if alternate_sequence==True and i%2 == starting_sequence: #make this descending
+            filtered_scale.append(base_scale_notes[i]+sum(scales[i][:4]))
+            filtered_scale.append(base_scale_notes[i]+sum(scales[i][:2]))
+            filtered_scale.append(base_scale_notes[i])
+        else:
+            filtered_scale.append(base_scale_notes[i])
+            filtered_scale.append(base_scale_notes[i]+sum(scales[i][:2]))
+            filtered_scale.append(base_scale_notes[i]+sum(scales[i][:4]))
 
-print(explore_scale('major', 'C4', False))
+    return filtered_scale
