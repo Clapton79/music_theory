@@ -215,5 +215,38 @@ def get_chord_info(chord):
             inversion = get_number(chord_details[2])
         else: #we have a chord shape
             shape = chord_details[1]
-    
+
     return get_chord(scale, base_note, inversion, shape)
+
+def get_scale_note(scale, base_note, degree):
+    degree_sum =  sum(chord_families[scale]['scale'][:degree-1])
+    nt = get_note_id(base_note)
+    return nt+degree_sum
+
+def get_scale_triad(scale, base_note, ascending=True):
+# get the 1st, 3rd, 5th of a scale in ascending or descending fashion
+    triad = []
+    triad.append (get_scale_note(scale, base_note, 5))
+    triad.append (get_scale_note(scale, base_note, 3))
+    triad.append (get_scale_note(scale, base_note, 1))
+    if ascending==True:
+        triad = sorted(triad)
+    return triad
+
+def explore_scale(family, base_note, alternate_sequence=True):
+    scale = []
+    ascending = True
+    base_scale=[]
+    for i, v in chord_families.items():
+        if v['family']==family:
+            print(i, v['degree'], v['scale'])
+            if v['degree']==1:
+                base_scale = v['scale']
+            if alternate_sequence == True and v['degree'] % 2 == 0:
+                ascending = False
+
+            scale.append(get_scale_triad(i, base_note,ascending))
+
+    return scale
+
+print(explore_scale('major', 'C4', False))
