@@ -12,5 +12,7 @@ import os
 #mh.create_music_chords(input_file, practice)
 #mh.play_music(input_file)
 
-scale = mt.explore_scale('major', 'C4', False)
-print (scale)
+#scale = mt.explore_scale('major', 'C4', False)
+#print (scale)
+
+print(dir(mt))
