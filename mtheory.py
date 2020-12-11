@@ -128,7 +128,7 @@ def find_note (note):
 
 
 def get_note_id(note):
-# searches for the midi note id.
+# searches for the midi note id
 
     i = find_note(get_text(note))
     note_level = get_number(note)
@@ -138,7 +138,7 @@ def get_note_id(note):
 
 
 def get_chord_shape(shape):
-#returns a list of what degrees and what alterations a chord has
+# returns a list of what degrees and what alterations a chord has
     try:
     #(get_number(x)-1)
         alteration = []
@@ -192,12 +192,14 @@ def get_chord(scale='major', base_note= 'C1', inversion=0, shape = 'major', add_
 
 
 def get_list_note_ids(notes):
+# returns up the midi note id's of a list of notes
     note_ids = []
     for note in notes:
         note_ids.append(get_note_id(note))
     return note_ids
 
 def get_chord_info(chord):
+# breaks down a chord into parts, then looks up its notes
     chord_details = chord.split(' ')
     #defaults
     shape = 'major'
@@ -219,6 +221,7 @@ def get_chord_info(chord):
     return get_chord(scale, base_note, inversion, shape)
 
 def get_scale_note(scale, base_note, degree):
+# returns the midi note id of the nth degree of a scale
     degree_sum =  sum(chord_families[scale]['scale'][:degree-1])
     nt = get_note_id(base_note)
     return nt+degree_sum
@@ -234,6 +237,7 @@ def get_scale_triad(scale, base_note, ascending=True):
     return triad
 
 def explore_scale(family, base_note, alternate_sequence=True, starting_sequence=0, base_scale_descending=False):
+    # explores a chord family by playing triads (alternating or not) in a descending or ascending fashion
     scales = []
     filtered_scale = []
     base_scale = []
