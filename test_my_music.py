@@ -15,8 +15,8 @@ import os
 #scale = mt.explore_scale('major', 'C4', False)
 #print (scale)
 
-input_file = os.getcwd()+'\output.mid'
-my_list = mt.explore_scale('major', 'F#4', True,1,True)
-my_list =  mt.explore_scale('major', 'A3', True,1,True) + [mt.get_note_id('A4')]
+input_file = os.getcwd()+'\FSharp4ChordExploration.mid'
+my_list = mt.explore_scale('harmonic minor', 'F#4', True,1,True)
+
 mh.create_music(input_file , my_list)
 mh.play_music(input_file)

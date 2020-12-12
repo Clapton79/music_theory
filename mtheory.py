@@ -76,9 +76,29 @@ chord_shapes = {
         ,   'add9'      :['1', '3', '5', '9']
         ,   'add13'     :['1', '3', '5', '13']
         ,   'add9/11'   :['1', '3', '5', '11']
+        ,   'sus2'      :['1', '2', '5']
+        ,   'sus4'      :['1', '4', '5']
+        ,   'dim'       :['1', 'b3', 'b5', '#9']
 }
 
-
+progression_degrees = {
+    'I'     :{'degree': 1, 'equivalent':'major'},
+    'II'    :{'degree': 2, 'equivalent':'major'},
+    'III'   :{'degree': 3, 'equivalent':'major'},
+    'IV'    :{'degree': 4, 'equivalent':'major'},
+    'V'     :{'degree': 5, 'equivalent':'major'},
+    'VI'    :{'degree': 6, 'equivalent':'major'},
+    'VII'   :{'degree': 7, 'equivalent':'major'},
+    'VIII'  :{'degree': 8, 'equivalent':'major'},
+    'i'     :{'degree': 1, 'equivalent':'minor'},
+    'ii'    :{'degree': 2, 'equivalent':'minor'},
+    'iii'   :{'degree': 3, 'equivalent':'minor'},
+    'iv'    :{'degree': 4, 'equivalent':'minor'},
+    'v'     :{'degree': 5, 'equivalent':'minor'},
+    'vi'    :{'degree': 6, 'equivalent':'minor'},
+    'vii'   :{'degree': 7, 'equivalent':'minor'},
+    'viii'  :{'degree': 8, 'equivalent':'minor'}
+}
 def get_scale(scale, base_note = 60, octaves = 1, close_with_base = False, reverse = False):
 # returns a list for a scale
 
@@ -268,3 +288,19 @@ def explore_scale(family, base_note, alternate_sequence=True, starting_sequence=
             filtered_scale.append(base_scale_notes[i]+sum(scales[i][:4]))
 
     return filtered_scale
+
+def get_note(note_id, use_b = False, with_octaves = False):
+# returns the midi note id for a note
+    # calculate the diff from the base C note
+    # and make the steps using the note arrays
+
+    diff = (note_id - MIDI_C_NOTE)%12
+    if with_octaves == False:
+        return sound_flats[diff] if use_b else sound_sharps[diff]
+    else:
+        return sound_flats[diff] + str(int(round(note_id/12,0))) if use_b else sound_sharps[diff] + str(int(round(note_id/12,0)))
+
+
+def get_chord_notes(chord):
+# returns the list of notes in a chord
+    return [get_note(x) for x in get_chord_info(chord)]
