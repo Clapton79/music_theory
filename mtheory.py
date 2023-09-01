@@ -100,11 +100,11 @@ progression_degrees = {
 
 def explore_scale(family, base_note, alternate_sequence = True, starting_sequence = 0, base_scale_descending = False):
     """Explores a chord family by playing triads (alternating or not) in a descending or ascending fashion."""
-    scales = []
     filtered_scale = []
+    scales = []
     base_scale = []
-    base_note_id = _get_note_id(base_note)
-    
+    base_midi_note_id = _get_midi_note_id(base_note)
+
     for i, v in chord_families.items():
         if v['family'] == family:
             scales.append(v['scale'])
@@ -113,8 +113,8 @@ def explore_scale(family, base_note, alternate_sequence = True, starting_sequenc
 
     #calculate base notes
     base_scale_notes = []
-    base_scale_notes.append(base_note_id)
-    base_scale_notes_further = [base_note_id + sum(base_scale[:i + 1]) for i, x in enumerate(base_scale) if i < len(base_scale) - 1]
+    base_scale_notes.append(base_midi_note_id)
+    base_scale_notes_further = [base_midi_note_id + sum(base_scale[:i + 1]) for i, x in enumerate(base_scale) if i < len(base_scale) - 1]
     base_scale_notes.extend(base_scale_notes_further)
 
     if base_scale_descending == True:
@@ -159,7 +159,7 @@ def _get_chord_info(chord):
 
 def _get_chord(scale='major', base_note= 'C1', inversion=0, shape = 'major', add_bass = False, bass_degree = 1):
     """Returns a list of chord sounds for a scale and base note."""
-    base_note_id = _get_note_id(base_note)
+    base_note_id = _get_midi_note_id(base_note)
 
     if inversion > 3 or inversion < 0:
         raise ValueError('Invalid inversion')
@@ -168,7 +168,7 @@ def _get_chord(scale='major', base_note= 'C1', inversion=0, shape = 'major', add
     if len(scale_notes) == 0:
         return []
     else:
-        degrees, alteration = _get_chord_shape(shape)
+        degrees, alteration = _get_chord_shapes(shape)
         chord = [scale_notes[a - 1] for a in degrees]
         chord = [a + alteration[i] for i, a in enumerate(chord)]
 
@@ -190,12 +190,12 @@ def _get_chord(scale='major', base_note= 'C1', inversion=0, shape = 'major', add
     return sorted(chord)
 
 
-def _get_chord_shape(shape):
+def _get_chord_shapes(shape):
     """Returns a list of what degrees and what alterations a chord has."""
     try:
-        alterations = []
         degrees = [_get_note_octave(x) for x in chord_shapes[shape]]
-        alt = [_get_text(x) for x in chord_shapes[shape]]
+        alterations = []
+        alt = [_get_note_base(x) for x in chord_shapes[shape]]
         for a in alt:
             if a == '':
                 alterations.append(0)
@@ -233,16 +233,17 @@ def _get_scale(scale, base_note = 60, octaves = 1, close_with_base = False, reve
         return []
 
 
-def _get_note_id(note: str):
-    """Searches for the midi note ID."""
-    note_index = _find_note_index(_get_text(note))
+def _get_midi_note_id(note: str):
+    """Returns the MIDI note ID."""
+    note_index = _get_note_index(_get_note_base(note))
     note_octave = _get_note_octave(note)
-    note_id = MIDI_C_NOTE + note_index + note_octave * MIDI_C_NOTE
-    return note_id
+#TODO: why do we start with MIDI_C_NOTE here? (is it (note_octave + 1) * MIDI_C_NOTE + note_index), but why?
+    midi_note_id = MIDI_C_NOTE + note_index + note_octave * MIDI_C_NOTE
+    return midi_note_id
 
 
-def _find_note_index(note: str):
-    """Finds the index of a note in the list of notes."""
+def _get_note_index(note: str):
+    """Finds the index of a note in the list of sounds."""
     if note not in sound_sharps and note not in sound_flats:
         raise ValueError(f"Note '{note}' does not exist!")
     if note in sound_sharps:
@@ -251,19 +252,19 @@ def _find_note_index(note: str):
         return sound_flats.index(note)
 
 
-def _get_note_octave(note_as_string: str):
+def _get_note_octave(note: str) -> int:
     """Returns only the octave of the note."""
     try:
-        return int(re.sub('[^\-0-9]', '', note_as_string))
+        return int(re.sub('[^\-0-9]', '', note))
     except:
-#TODO: why the default 4?
+#TODO: why the default 4? should validate the incoming note
         return 4
 
 
-def _get_text(note_as_string: str):
-    """Returns only the base character of the note."""
-#TODO: why there is no ex handling and default here?
-    return re.sub('[\-0-9]', '', note_as_string)
+def _get_note_base(note: str) -> str:
+    """Returns only the base note of a sound."""
+#TODO: should validate the incoming note
+    return re.sub('[\-0-9]', '', note)
 
 
 #TODO: not in use | public?
@@ -271,7 +272,7 @@ def __get_list_note_ids(notes):
     """Returns up the midi note ID's of a list of notes."""
     note_ids = []
     for note in notes:
-        note_ids.append(_get_note_id(note))
+        note_ids.append(_get_midi_note_id(note))
     return note_ids
 
 
@@ -311,5 +312,5 @@ def __get_note(note_id, use_flat = False, with_octaves = False):
 def __get_scale_note(scale, base_note, degree):
     """Returns the midi note ID of the Nth degree of a scale."""
     degree_sum = sum(chord_families[scale]['scale'][:degree - 1])
-    note_id = _get_note_id(base_note)
+    note_id = _get_midi_note_id(base_note)
     return note_id + degree_sum

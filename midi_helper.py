@@ -15,7 +15,7 @@ def play_music(filename):
         # check if playback has finished
         clock.tick(30)
 
-def create_music(filename, notes):
+def create_music(filename, midi_notes):
     """Creates a midi file with the nodes."""
     track    = 0
     channel  = 0
@@ -26,8 +26,8 @@ def create_music(filename, notes):
 
     MyMIDI = MIDIFile(1)  # One track, defaults to format 1 (tempo track is created automatically)
     MyMIDI.addTempo(track, time, tempo)
-    for i, pitch in enumerate(notes):
-        if i == len(notes) - 1: # if this is the last note, let it ring
+    for i, pitch in enumerate(midi_notes):
+        if i == len(midi_notes) - 1: # if this is the last note, let it ring
             MyMIDI.addNote(track, channel, pitch, time + i, duration * 2, volume)
         else:
             MyMIDI.addNote(track, channel, pitch, time + i, duration, volume)

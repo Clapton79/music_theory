@@ -13,12 +13,12 @@ progressions.
 | music_theory | explore_scale         | Explores a chord family by playing triads (alternating or not) in a descending or ascending fashion.                      | public     |
 |              | \_get_chord_info      | Breaks down a chord into parts, then looks up its notes.                                                                  | private    |
 |              | \_get_chord           | Returns a list of chord sounds for a scale and base note.                                                                 | private    |
-|              | \_get_chord_shape     | Returns a list of what degrees and what alterations a chord has.                                                          | private    |
+|              | \_get_chord_shapes    | Returns a list of what degrees and what alterations a chord has.                                                          | private    |
 |              | \_get_scale           | Returns a list of notes for a scale.                                                                                      | private    |
-|              | \_get_note_id         | Searches for the midi note ID.                                                                                            | private    |
-|              | \_find_note_index     | Finds the index of a note in the list of notes.                                                                           | private    |
+|              | \_get_midi_note_id    | Returns the MIDI note ID.                                                                                                 | private    |
+|              | \_get_note_index      | Returns the index of a note in the list of notes.                                                                         | private    |
 |              | \_get_note_octave     | Returns only the octave of the note.                                                                                      | private    |
-|              | \_get_text            | Removes numbers from a text.                                                                                              | private    |
+|              | \_get_note_base       | Removes numbers from a text.                                                                                              | private    |
 |              | \_\_get_list_note_ids | Returns up the midi note ID's of a list of notes.                                                                         | not in use |
 |              | \_\_get_scale_triad   | Gets the 1st, 3rd, 5th of a scale in ascending or descending fashion.                                                     | not in use |
 |              | \_\_get_chord_notes   | Returns the list of notes in a chord.                                                                                     | not in use |
