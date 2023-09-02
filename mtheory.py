@@ -6,47 +6,51 @@ sound_sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#','A', 'A#', 'B']
 sound_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
 MIDI_C_NOTE = 12
+BASE_DEGREE_ID = 1
+PROPERTY_MAIN_FAMILY = 'main_family'
+PROPERTY_SCALE = 'scale'
+PROPERTY_DEGREE = 'degree'
 
-chord_families = {
-    'major'                 : { 'scale': [2,2,1,2,2,2,1], 'degree': 1, 'family' : 'major' },
-    'dorian'                : { 'scale': [2,1,2,2,2,1,2], 'degree': 2, 'family' : 'major' },
-    'phrygian'              : { 'scale': [1,2,2,2,1,2,2], 'degree': 3, 'family' : 'major' },
-    'lidyan'                : { 'scale': [2,2,2,1,2,2,1], 'degree': 4, 'family' : 'major' },
-    'mixolydian'            : { 'scale': [2,2,1,2,2,1,2], 'degree': 5, 'family' : 'major' },
-    'natural minor'         : { 'scale': [2,1,2,2,1,2,2], 'degree': 6, 'family' : 'major' },
-    'locrian'               : { 'scale': [1,2,2,1,2,2,2], 'degree': 7, 'family' : 'major' },
+chord_families = {             # scale - number of semitones
+    'major'                 : { 'scale': [2,2,1,2,2,2,1], 'degree': 1, 'main_family' : 'major' },
+    'dorian'                : { 'scale': [2,1,2,2,2,1,2], 'degree': 2, 'main_family' : 'major' },
+    'phrygian'              : { 'scale': [1,2,2,2,1,2,2], 'degree': 3, 'main_family' : 'major' },
+    'lydian'                : { 'scale': [2,2,2,1,2,2,1], 'degree': 4, 'main_family' : 'major' },
+    'mixolydian'            : { 'scale': [2,2,1,2,2,1,2], 'degree': 5, 'main_family' : 'major' },
+    'natural minor'         : { 'scale': [2,1,2,2,1,2,2], 'degree': 6, 'main_family' : 'major' },
+    'locrian'               : { 'scale': [1,2,2,1,2,2,2], 'degree': 7, 'main_family' : 'major' },
  
-    'melodic minor'         : { 'scale': [2,1,2,2,1,2,2], 'degree': 1, 'family': 'melodic minor' },
-    'dorian b2'             : { 'scale': [1,2,2,1,2,2,2], 'degree': 2, 'family': 'melodic minor' },
-    'lydian augmented'      : { 'scale': [2,2,1,2,2,2,1], 'degree': 3, 'family': 'melodic minor' },
-    'lydian dominant'       : { 'scale': [2,1,2,2,2,1,2], 'degree': 4, 'family': 'melodic minor' },
-    'aeolian dominant'      : { 'scale': [1,2,2,2,1,2,2], 'degree': 5, 'family': 'melodic minor' },
-    'half diminished'       : { 'scale': [2,2,2,1,2,2,1], 'degree': 6, 'family': 'melodic minor' },
-    'altered'               : { 'scale': [2,2,1,2,2,1,2], 'degree': 7, 'family': 'melodic minor' },
+    'melodic minor'         : { 'scale': [2,1,2,2,1,2,2], 'degree': 1, 'main_family': 'melodic minor' },
+    'dorian b2'             : { 'scale': [1,2,2,1,2,2,2], 'degree': 2, 'main_family': 'melodic minor' },
+    'lydian augmented'      : { 'scale': [2,2,1,2,2,2,1], 'degree': 3, 'main_family': 'melodic minor' },
+    'lydian dominant'       : { 'scale': [2,1,2,2,2,1,2], 'degree': 4, 'main_family': 'melodic minor' },
+    'aeolian dominant'      : { 'scale': [1,2,2,2,1,2,2], 'degree': 5, 'main_family': 'melodic minor' },
+    'half diminished'       : { 'scale': [2,2,2,1,2,2,1], 'degree': 6, 'main_family': 'melodic minor' },
+    'altered'               : { 'scale': [2,2,1,2,2,1,2], 'degree': 7, 'main_family': 'melodic minor' },
  
-    'harmonic minor'        : { 'scale': [2,1,2,2,1,3,1], 'degree': 1, 'family': 'harmonic minor' },
-    'locrian natural 6'     : { 'scale': [1,2,2,1,3,1,2], 'degree': 2, 'family': 'harmonic minor' },
-    'major #5'              : { 'scale': [2,2,1,3,1,2,1], 'degree': 3, 'family': 'harmonic minor' },
-    'dorian #4'             : { 'scale': [2,1,3,1,2,1,2], 'degree': 4, 'family': 'harmonic minor' },
-    'phrygian dominant'     : { 'scale': [1,3,1,2,1,2,2], 'degree': 5, 'family': 'harmonic minor' },
-    'lydian #2'             : { 'scale': [3,1,2,1,2,2,1], 'degree': 6, 'family': 'harmonic minor' },
-    'altered dominant bb7'  : { 'scale': [1,2,1,2,2,1,3], 'degree': 7, 'family': 'harmonic minor' },
+    'harmonic minor'        : { 'scale': [2,1,2,2,1,3,1], 'degree': 1, 'main_family': 'harmonic minor' },
+    'locrian natural 6'     : { 'scale': [1,2,2,1,3,1,2], 'degree': 2, 'main_family': 'harmonic minor' },
+    'major #5'              : { 'scale': [2,2,1,3,1,2,1], 'degree': 3, 'main_family': 'harmonic minor' },
+    'dorian #4'             : { 'scale': [2,1,3,1,2,1,2], 'degree': 4, 'main_family': 'harmonic minor' },
+    'phrygian dominant'     : { 'scale': [1,3,1,2,1,2,2], 'degree': 5, 'main_family': 'harmonic minor' },
+    'lydian #2'             : { 'scale': [3,1,2,1,2,2,1], 'degree': 6, 'main_family': 'harmonic minor' },
+    'altered dominant bb7'  : { 'scale': [1,2,1,2,2,1,3], 'degree': 7, 'main_family': 'harmonic minor' },
  
-    'harmonic major'        : { 'scale': [2,2,1,2,1,3,1], 'degree': 1, 'family': 'harmonic major' },
-    'dorian b5'             : { 'scale': [2,1,2,1,3,1,2], 'degree': 2, 'family': 'harmonic major' },
-    'phrygian b4'           : { 'scale': [1,2,1,3,1,2,2], 'degree': 3, 'family': 'harmonic major' },
-    'lydian b3'             : { 'scale': [2,1,3,1,2,2,1], 'degree': 4, 'family': 'harmonic major' },
-    'mixolydian b2'         : { 'scale': [1,3,1,2,2,1,2], 'degree': 5, 'family': 'harmonic major' },
-    'lydian augmented'      : { 'scale': [3,1,2,2,1,2,1], 'degree': 6, 'family': 'harmonic major' },
-    'locrian bb7'           : { 'scale': [1,2,2,1,2,1,3], 'degree': 7, 'family': 'harmonic major' },
+    'harmonic major'        : { 'scale': [2,2,1,2,1,3,1], 'degree': 1, 'main_family': 'harmonic major' },
+    'dorian b5'             : { 'scale': [2,1,2,1,3,1,2], 'degree': 2, 'main_family': 'harmonic major' },
+    'phrygian b4'           : { 'scale': [1,2,1,3,1,2,2], 'degree': 3, 'main_family': 'harmonic major' },
+    'lydian b3'             : { 'scale': [2,1,3,1,2,2,1], 'degree': 4, 'main_family': 'harmonic major' },
+    'mixolydian b2'         : { 'scale': [1,3,1,2,2,1,2], 'degree': 5, 'main_family': 'harmonic major' },
+    'lydian augmented'      : { 'scale': [3,1,2,2,1,2,1], 'degree': 6, 'main_family': 'harmonic major' },
+    'locrian bb7'           : { 'scale': [1,2,2,1,2,1,3], 'degree': 7, 'main_family': 'harmonic major' },
  
-    'diminished'            : { 'scale': [2,1,2,1,2,1,2], 'degree': 1, 'family': 'diminished' },
-    'inverted diminished'   : { 'scale': [1,2,1,2,1,2,1], 'degree': 2, 'family': 'diminished' },
+    'diminished'            : { 'scale': [2,1,2,1,2,1,2], 'degree': 1, 'main_family': 'diminished' },
+    'inverted diminished'   : { 'scale': [1,2,1,2,1,2,1], 'degree': 2, 'main_family': 'diminished' },
   
-    'whole tone'            : { 'scale': [2,2,2,2,2],     'degree': 1, 'family': 'whole tone' },
+    'whole tone'            : { 'scale': [2,2,2,2,2],     'degree': 1, 'main_family': 'whole tone' },
   
-    'augmented'             : { 'scale': [3,1,3,1,3,1],   'degree': 1, 'family': 'augmented' },
-    'inverted augmented'    : { 'scale': [1,3,1,3,1,3],   'degree': 2, 'family': 'augmented' }
+    'augmented'             : { 'scale': [3,1,3,1,3,1],   'degree': 1, 'main_family': 'augmented' },
+    'inverted augmented'    : { 'scale': [1,3,1,3,1,3],   'degree': 2, 'main_family': 'augmented' }
 }
 
 chord_shapes = {
@@ -98,40 +102,47 @@ progression_degrees = {
 }
 
 
-def explore_scale(family, base_note, alternate_sequence = True, starting_sequence = 0, base_scale_descending = False):
+def explore_scale(main_chord_family, base_note, alternate_sequence = True, starting_sequence = 0, base_scale_descending = False):
     """Explores a chord family by playing triads (alternating or not) in a descending or ascending fashion."""
     filtered_scale = []
-    scales = []
-    base_scale = []
+    scales = []         # each scale for a main chord family
+    base_scale = []     # represents the intervals between notes in the base scale
     base_midi_note_id = _get_midi_note_id(base_note)
 
-    for i, v in chord_families.items():
-        if v['family'] == family:
-            scales.append(v['scale'])
-            if v['degree'] == 1:
-                base_scale = v['scale']
+    filtered_chord_families = [chord_families[key] for key in chord_families if chord_families[key][PROPERTY_MAIN_FAMILY] == main_chord_family]
 
-    #calculate base notes
+    for cord_family in filtered_chord_families:
+        scales.append(cord_family[PROPERTY_SCALE])
+        if cord_family[PROPERTY_DEGREE] == BASE_DEGREE_ID:
+            base_scale = cord_family[PROPERTY_SCALE]
+
+    base_scale_notes = _create_base_scale_notes(base_midi_note_id, base_scale, base_scale_descending)
+
+    if base_scale_descending == True:
+        scales.reverse()
+
+    for key, a in enumerate(scales):
+        if alternate_sequence == True and key % 2 == starting_sequence: # make this descending
+            filtered_scale.append(base_scale_notes[key] + sum(scales[key][:4]))
+            filtered_scale.append(base_scale_notes[key] + sum(scales[key][:2]))
+            filtered_scale.append(base_scale_notes[key])
+        else:
+            filtered_scale.append(base_scale_notes[key])
+            filtered_scale.append(base_scale_notes[key] + sum(scales[key][:2]))
+            filtered_scale.append(base_scale_notes[key] + sum(scales[key][:4]))
+
+    return filtered_scale
+
+def _create_base_scale_notes(base_midi_note_id: str, base_scale: [], base_scale_descending: bool = False) -> []:
     base_scale_notes = []
     base_scale_notes.append(base_midi_note_id)
-    base_scale_notes_further = [base_midi_note_id + sum(base_scale[:i + 1]) for i, x in enumerate(base_scale) if i < len(base_scale) - 1]
+    base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, x in enumerate(base_scale) if idx < len(base_scale) - 1]
     base_scale_notes.extend(base_scale_notes_further)
 
     if base_scale_descending == True:
-        base_scale_notes = list(reversed(base_scale_notes))
-        scales = list(reversed(scales))
+        base_scale_notes.reverse()
 
-    for i, a in enumerate(scales):
-        if alternate_sequence == True and i % 2 == starting_sequence: # make this descending
-            filtered_scale.append(base_scale_notes[i] + sum(scales[i][:4]))
-            filtered_scale.append(base_scale_notes[i] + sum(scales[i][:2]))
-            filtered_scale.append(base_scale_notes[i])
-        else:
-            filtered_scale.append(base_scale_notes[i])
-            filtered_scale.append(base_scale_notes[i] + sum(scales[i][:2]))
-            filtered_scale.append(base_scale_notes[i] + sum(scales[i][:4]))
-
-    return filtered_scale
+    return base_scale_notes
 
 
 def _get_chord_info(chord):
@@ -170,7 +181,7 @@ def _get_chord(scale='major', base_note= 'C1', inversion=0, shape = 'major', add
     else:
         degrees, alteration = _get_chord_shapes(shape)
         chord = [scale_notes[a - 1] for a in degrees]
-        chord = [a + alteration[i] for i, a in enumerate(chord)]
+        chord = [a + alteration[idx] for idx, a in enumerate(chord)]
 
     if inversion == 1:
         chord[0] += MIDI_C_NOTE

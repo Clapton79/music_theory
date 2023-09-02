@@ -16,9 +16,9 @@ import os
 #print (scale)
 
 input_file = f"{os.getcwd()}\FSharp4ChordExploration.mid"
-family = 'harmonic minor'
+chord_family = 'harmonic minor'
 base_note = 'F#4'
-midi_notes = mt.explore_scale(family, base_note, True, 1, True)
+midi_notes = mt.explore_scale(chord_family, base_note, True, 1, True)
 
 mh.create_music(input_file, midi_notes)
 mh.play_music(input_file)
