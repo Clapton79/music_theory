@@ -1,7 +1,9 @@
 import regex as re
 # import itertools
 # import collections
+from typing import Tuple, List
 
+from scaleorder import ScaleOrder
 
 class MusicTheory(object):
 
@@ -109,25 +111,50 @@ class MusicTheory(object):
         pass
 
 
-    def explore_scale(self, main_chord_family, base_note, starting_sequence = 0, alternate_sequence = True, base_scale_descending = False):
+    def explore_scale(self, main_chord_family, base_note, starting_sequence = 0, alternate_sequence = True, scale_order: ScaleOrder = ScaleOrder.ASCENDING) -> []:
         """Explores a chord family by playing triads (alternating or not) in a descending or ascending fashion."""
-        final_scale = []
-        scales = []         # each scale for a main chord family
-        base_scale = []     # represents the intervals between notes in the base scale
-        base_midi_note_id = self.__get_midi_note_id(base_note)
 
+        # get each relevant chord family by a main chord family
         filtered_chord_families = [MusicTheory.CHORD_FAMILIES[key] for key in MusicTheory.CHORD_FAMILIES if MusicTheory.CHORD_FAMILIES[key][MusicTheory.PROPERTY_MAIN_FAMILY] == main_chord_family]
 
+        scales = []         # each scale for a main chord family
+        base_scale = []     # represents the intervals between notes in the base scale
+        scales, base_scale = self.__get_scales_and_base_scale(filtered_chord_families, scale_order)
+
+        base_midi_note_id = self.__get_midi_note_id(base_note)
+        #TODO: what happens if there is no scales with degree == 1?
+        base_scale_notes = self.__create_base_scale_notes(base_midi_note_id, base_scale)
+
+        final_scale = self.__asd(scales, base_scale, starting_sequence, alternate_sequence)
+        return final_scale
+
+
+    def __get_scales_and_base_scale(self, filtered_chord_families: [], scale_order: ScaleOrder = ScaleOrder.ASCENDING) -> Tuple[List[int], List[str]]:
+        """Gets the 'scales' and the 'base scale'."""
+        scales = []
+        base_scale = []
         for chord_family in filtered_chord_families:
             scales.append(chord_family[MusicTheory.PROPERTY_SCALE])
             if chord_family[MusicTheory.PROPERTY_DEGREE] == MusicTheory.BASE_DEGREE_ID:
                 base_scale = chord_family[MusicTheory.PROPERTY_SCALE]
 
-        base_scale_notes = self.__create_base_scale_notes(base_midi_note_id, base_scale, base_scale_descending)
-
-        if base_scale_descending == True:
+        if scale_order == ScaleOrder.DESCENDING:
             scales.reverse()
+            base_scale.reverse()
 
+        return scales, base_scale
+
+
+    def __create_base_scale_notes(self, base_midi_note_id: str, base_scale: []) -> []:
+        base_scale_notes = []
+        base_scale_notes.append(base_midi_note_id)
+        base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, x in enumerate(base_scale) if idx < len(base_scale) - 1]
+        base_scale_notes.extend(base_scale_notes_further)
+
+        return base_scale_notes
+
+    def __asd(scales: [], base_scale: [], starting_sequence: int = 0, alternate_sequence: bool = True):
+        final_scale = []
         for idx, a in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
                 final_scale.append(base_scale_notes[idx] + sum(scales[idx][:4]))
@@ -137,20 +164,7 @@ class MusicTheory(object):
                 final_scale.append(base_scale_notes[idx])
                 final_scale.append(base_scale_notes[idx] + sum(scales[idx][:2]))
                 final_scale.append(base_scale_notes[idx] + sum(scales[idx][:4]))
-
         return final_scale
-
-    def __create_base_scale_notes(self, base_midi_note_id: str, base_scale: [], base_scale_descending: bool = False) -> []:
-        base_scale_notes = []
-        base_scale_notes.append(base_midi_note_id)
-        base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, x in enumerate(base_scale) if idx < len(base_scale) - 1]
-        base_scale_notes.extend(base_scale_notes_further)
-
-        if base_scale_descending == True:
-            base_scale_notes.reverse()
-
-        return base_scale_notes
-
 
     def __get_chord_info(self, chord):
         """Breaks down a chord into parts, then looks up its notes."""
@@ -251,7 +265,7 @@ class MusicTheory(object):
             return []
 
 
-    def __get_midi_note_id(self, note: str):
+    def __get_midi_note_id(self, note: str) -> int:
         """Returns the MIDI note ID."""
         note_index = self.__get_note_index(self.__get_note_base(note))
         note_octave = self.__get_note_octave(note)
@@ -260,7 +274,7 @@ class MusicTheory(object):
         return midi_note_id
 
 
-    def __get_note_index(self, note: str):
+    def __get_note_index(self, note: str) -> int:
         """Finds the index of a note in the list of sounds."""
         if note not in MusicTheory.SOUND_SHARPS and note not in MusicTheory.SOUND_FLATS:
             raise ValueError(f"Note '{note}' does not exist!")
@@ -286,7 +300,7 @@ class MusicTheory(object):
 
 
     #TODO: not in use | public?
-    def __get_list_note_ids(self, notes):
+    def __get_list_note_ids(self, notes) -> []:
         """Returns up the midi note ID's of a list of notes."""
         note_ids = []
         for note in notes:
@@ -295,7 +309,7 @@ class MusicTheory(object):
 
 
     #TODO: not in use | public?
-    def __get_scale_triad(self, scale, base_note, ascending = True):
+    def __get_scale_triad(self, scale, base_note, ascending = True) -> []:
         """Gets the 1st, 3rd, 5th of a scale in ascending or descending fashion."""
         triad = []
     #TODO: why in this desc order? does it matter?
@@ -308,7 +322,7 @@ class MusicTheory(object):
 
 
     #TODO: not in use
-    def __get_chord_notes(self, chord):
+    def __get_chord_notes(self, chord) -> []:
         """Returns the list of notes in a chord."""
         return [self.__get_note(x) for x in self.__get_chord_info(chord)]
 
