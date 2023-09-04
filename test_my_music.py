@@ -1,4 +1,5 @@
-import mtheory as mt
+#import mtheory as mt
+from mtheory import MusicTheory
 import midi_helper as mh
 import os
 
@@ -18,7 +19,8 @@ import os
 input_file = f"{os.getcwd()}\FSharp4ChordExploration.mid"
 chord_family = 'harmonic minor'
 base_note = 'F#4'
-midi_notes = mt.explore_scale(chord_family, base_note, True, 1, True)
+musicTheory = MusicTheory()
+midi_notes = musicTheory.explore_scale(chord_family, base_note, 1, True, True)
 
 mh.create_music(input_file, midi_notes)
 mh.play_music(input_file)
