@@ -153,7 +153,7 @@ class MusicTheory(object):
         return base_scale_notes
     
 
-    def __asd(self, scales: [], base_scale_notes: [], starting_sequence: int = 0, alternate_sequence: bool = True):
+    def __create_final_scale_notes(self, scales: [], base_scale_notes: [], starting_sequence: int = 0, alternate_sequence: bool = True):
         final_scale_notes = []
         for idx, a in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
