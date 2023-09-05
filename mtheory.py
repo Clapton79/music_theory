@@ -121,11 +121,15 @@ class MusicTheory(object):
         base_scale = []     # represents the intervals between notes in the base scale
         scales, base_scale = self.__get_scales_and_base_scale(filtered_chord_families, scale_order)
 
-        base_midi_note_id = self.__get_midi_note_id(base_note)
         #TODO: what happens if there is no scales with degree == 1?
-        base_scale_notes = self.__create_base_scale_notes(base_midi_note_id, base_scale)
+        base_scale_semitones = self.__create_base_semitones(base_scale)
 
-        final_scale_notes = self.__create_final_scale_notes(scales, base_scale_notes, starting_sequence, alternate_sequence)
+        final_scale_semitones = self.__create_final_scale_semitones(base_scale_semitones, scales, starting_sequence, alternate_sequence)
+
+        #TODO: we should not create the list of MIDI note IDs at this point, only the scale [now we loose the sharp/flat part too],
+        # and have a separate class to convert it to MIDI notes
+        base_midi_note_id = self.__get_midi_note_id(base_note)
+        final_scale_notes = [base_midi_note_id + semitone for semitone in final_scale_semitones]
         return final_scale_notes
 
 
@@ -139,32 +143,32 @@ class MusicTheory(object):
                 base_scale = chord_family[MusicTheory.PROPERTY_SCALE]
 
         if scale_order == ScaleOrder.DESCENDING:
+            #TODO: if there is a single scale in the list (as in the base_scale),
+            #  then the order of the single array (here the base_scale) is changed! Is this intentional?
             scales.reverse()
             base_scale.reverse()
 
         return scales, base_scale
 
 
-    def __create_base_scale_notes(self, base_midi_note_id: str, base_scale: []) -> []:
-        base_scale_notes = []
-        base_scale_notes.append(base_midi_note_id)
-        base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, _ in enumerate(base_scale) if idx < len(base_scale) - 1]
-        base_scale_notes.extend(base_scale_notes_further)
-        return base_scale_notes
-    
+    def __create_base_semitones(self, base_scale: []) -> []:
+        base_scale_semi_tones = [sum(base_scale[0:idx]) for idx, _ in enumerate(base_scale)]
+        return base_scale_semi_tones
 
-    def __create_final_scale_notes(self, scales: [], base_scale_notes: [], starting_sequence: int = 0, alternate_sequence: bool = True):
-        final_scale_notes = []
+
+    def __create_final_scale_semitones(self, base_scale_semitones: [], scales: [], starting_sequence: int = 0, alternate_sequence: bool = True):
+        final_scale_semitones = []
+
         for idx, _ in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
-                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:4]))
-                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:2]))
-                final_scale_notes.append(base_scale_notes[idx])
+                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:4]))
+                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:2]))
+                final_scale_semitones.append(base_scale_semitones[idx])
             else:
-                final_scale_notes.append(base_scale_notes[idx])
-                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:2]))
-                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:4]))
-        return final_scale_notes
+                final_scale_semitones.append(base_scale_semitones[idx])
+                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:2]))
+                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:4]))
+        return final_scale_semitones
     
 
     def __get_chord_info(self, chord):
@@ -262,7 +266,7 @@ class MusicTheory(object):
                 result.reverse()
 
             return result
-    #TODO: should not happen, investigate how to prevent it
+        #TODO: should not happen, investigate how to prevent it
         except IndexError:
             return []
 
@@ -271,7 +275,7 @@ class MusicTheory(object):
         """Returns the MIDI note ID."""
         note_index = self.__get_note_index(self.__get_note_base(note))
         note_octave = self.__get_note_octave(note)
-    #TODO: why do we start with MIDI_C_NOTE here? (is it (note_octave + 1) * MIDI_C_NOTE + note_index), but why?
+        #TODO: why do we start with MIDI_C_NOTE here? (is it (note_octave + 1) * MIDI_C_NOTE + note_index), but why?
         midi_note_id = MusicTheory.MIDI_C_NOTE + note_index + note_octave * MusicTheory.MIDI_C_NOTE
         return midi_note_id
 
@@ -291,13 +295,13 @@ class MusicTheory(object):
         try:
             return int(re.sub('[^\-0-9]', '', note))
         except:
-    #TODO: why the default 4? should validate the incoming note
+        #TODO: why the default 4? should validate the incoming note
             return 4
 
 
     def __get_note_base(self, note: str) -> str:
         """Returns only the base note of a sound."""
-    #TODO: should validate the incoming note
+        #TODO: should validate the incoming note
         return re.sub('[\-0-9]', '', note)
 
 
@@ -314,7 +318,7 @@ class MusicTheory(object):
     def __get_scale_triad(self, scale, base_note, ascending = True) -> []:
         """Gets the 1st, 3rd, 5th of a scale in ascending or descending fashion."""
         triad = []
-    #TODO: why in this desc order? does it matter?
+        #TODO: why in this desc order? does it matter?
         triad.append(self.__get_scale_note(scale, base_note, 5))
         triad.append(self.__get_scale_note(scale, base_note, 3))
         triad.append(self.__get_scale_note(scale, base_note, 1))
