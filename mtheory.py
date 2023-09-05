@@ -278,12 +278,12 @@ class MusicTheory(object):
 
     def __get_note_index(self, note: str) -> int:
         """Finds the index of a note in the list of sounds."""
-        if note not in MusicTheory.SOUND_SHARPS and note not in MusicTheory.SOUND_FLATS:
-            raise ValueError(f"Note '{note}' does not exist!")
         if note in MusicTheory.SOUND_SHARPS:
             return MusicTheory.SOUND_SHARPS.index(note)
         elif note in MusicTheory.SOUND_FLATS:
             return MusicTheory.SOUND_FLATS.index(note)
+        else:
+            raise ValueError(f"Note '{note}' does not exist!")
 
 
     def __get_note_octave(self, note: str) -> int:
