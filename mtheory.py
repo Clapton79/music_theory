@@ -125,8 +125,8 @@ class MusicTheory(object):
         #TODO: what happens if there is no scales with degree == 1?
         base_scale_notes = self.__create_base_scale_notes(base_midi_note_id, base_scale)
 
-        final_scale = self.__asd(scales, base_scale, starting_sequence, alternate_sequence)
-        return final_scale
+        final_scale_notes = self.__create_final_scale_notes(scales, base_scale_notes, starting_sequence, alternate_sequence)
+        return final_scale_notes
 
 
     def __get_scales_and_base_scale(self, filtered_chord_families: [], scale_order: ScaleOrder = ScaleOrder.ASCENDING) -> Tuple[List[int], List[str]]:
@@ -150,21 +150,22 @@ class MusicTheory(object):
         base_scale_notes.append(base_midi_note_id)
         base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, x in enumerate(base_scale) if idx < len(base_scale) - 1]
         base_scale_notes.extend(base_scale_notes_further)
-
         return base_scale_notes
+    
 
-    def __asd(scales: [], base_scale: [], starting_sequence: int = 0, alternate_sequence: bool = True):
-        final_scale = []
+    def __asd(self, scales: [], base_scale_notes: [], starting_sequence: int = 0, alternate_sequence: bool = True):
+        final_scale_notes = []
         for idx, a in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
-                final_scale.append(base_scale_notes[idx] + sum(scales[idx][:4]))
-                final_scale.append(base_scale_notes[idx] + sum(scales[idx][:2]))
-                final_scale.append(base_scale_notes[idx])
+                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:4]))
+                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:2]))
+                final_scale_notes.append(base_scale_notes[idx])
             else:
-                final_scale.append(base_scale_notes[idx])
-                final_scale.append(base_scale_notes[idx] + sum(scales[idx][:2]))
-                final_scale.append(base_scale_notes[idx] + sum(scales[idx][:4]))
-        return final_scale
+                final_scale_notes.append(base_scale_notes[idx])
+                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:2]))
+                final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:4]))
+        return final_scale_notes
+    
 
     def __get_chord_info(self, chord):
         """Breaks down a chord into parts, then looks up its notes."""
