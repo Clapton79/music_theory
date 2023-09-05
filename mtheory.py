@@ -116,15 +116,7 @@ class MusicTheory(object):
 
         # get each relevant chord family by a main chord family
         filtered_chord_families = [MusicTheory.CHORD_FAMILIES[key] for key in MusicTheory.CHORD_FAMILIES if MusicTheory.CHORD_FAMILIES[key][MusicTheory.PROPERTY_MAIN_FAMILY] == main_chord_family]
-
-        scales = []         # each scale for a main chord family
-        base_scale = []     # represents the intervals between notes in the base scale
-        scales, base_scale = self.__get_scales_and_base_scale(filtered_chord_families, scale_order)
-
-        #TODO: what happens if there is no scales with degree == 1?
-        base_scale_semitones = self.__create_base_semitones(base_scale)
-
-        final_scale_semitones = self.__create_final_scale_semitones(base_scale_semitones, scales, starting_sequence, alternate_sequence)
+        final_scale_semitones = self.__create_scale_semitones(filtered_chord_families, starting_sequence, alternate_sequence, scale_order)
 
         #TODO: we should not create the list of MIDI note IDs at this point, only the scale [now we loose the sharp/flat part too],
         # and have a separate class to convert it to MIDI notes
@@ -133,32 +125,14 @@ class MusicTheory(object):
         return final_scale_notes
 
 
-    def __get_scales_and_base_scale(self, filtered_chord_families: [], scale_order: ScaleOrder = ScaleOrder.ASCENDING) -> Tuple[List[int], List[str]]:
-        """Gets the 'scales' and the 'base scale'."""
-        scales = []
-        base_scale = []
-        for chord_family in filtered_chord_families:
-            scales.append(chord_family[MusicTheory.PROPERTY_SCALE])
-            if chord_family[MusicTheory.PROPERTY_DEGREE] == MusicTheory.BASE_DEGREE_ID:
-                base_scale = chord_family[MusicTheory.PROPERTY_SCALE]
+    def __create_scale_semitones(self, filtered_chord_families: [], starting_sequence: int = 0, alternate_sequence: bool = True,scale_order: ScaleOrder = ScaleOrder.ASCENDING):
+        base_scale = []     # represents the intervals between notes in the base scale
+        scales = []         # each scale for chords in a main chord family
+        base_scale, scales = self.__get_base_scale_and_scales(filtered_chord_families, scale_order)
+        #TODO: what happens if there is no scales with degree == 1?
+        base_scale_semitones = self.__create_base_scale_semitones(base_scale)
 
-        if scale_order == ScaleOrder.DESCENDING:
-            #TODO: if there is a single scale in the list (as in the base_scale),
-            #  then the order of the single array (here the base_scale) is changed! Is this intentional?
-            scales.reverse()
-            base_scale.reverse()
-
-        return scales, base_scale
-
-
-    def __create_base_semitones(self, base_scale: []) -> []:
-        base_scale_semi_tones = [sum(base_scale[0:idx]) for idx, _ in enumerate(base_scale)]
-        return base_scale_semi_tones
-
-
-    def __create_final_scale_semitones(self, base_scale_semitones: [], scales: [], starting_sequence: int = 0, alternate_sequence: bool = True):
         final_scale_semitones = []
-
         for idx, _ in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
                 final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:4]))
@@ -169,7 +143,30 @@ class MusicTheory(object):
                 final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:2]))
                 final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:4]))
         return final_scale_semitones
-    
+
+
+    def __get_base_scale_and_scales(self, filtered_chord_families: [], scale_order: ScaleOrder = ScaleOrder.ASCENDING) -> Tuple[List[int], List[str]]:
+        """Gets the 'scales' and the 'base scale'."""
+        base_scale = []
+        scales = []
+        for chord_family in filtered_chord_families:
+            scales.append(chord_family[MusicTheory.PROPERTY_SCALE])
+            if chord_family[MusicTheory.PROPERTY_DEGREE] == MusicTheory.BASE_DEGREE_ID:
+                base_scale = chord_family[MusicTheory.PROPERTY_SCALE]
+
+        if scale_order == ScaleOrder.DESCENDING:
+            #TODO: if there is a single scale in the list (as in the base_scale),
+            #  then the order of the single array (here the base_scale) is changed! Is this intentional?
+            base_scale.reverse()
+            scales.reverse()
+
+        return base_scale, scales
+
+
+    def __create_base_scale_semitones(self, base_scale: []) -> []:
+        base_scale_semi_tones = [sum(base_scale[0:idx]) for idx, _ in enumerate(base_scale)]
+        return base_scale_semi_tones
+
 
     def __get_chord_info(self, chord):
         """Breaks down a chord into parts, then looks up its notes."""
