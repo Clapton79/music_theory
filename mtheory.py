@@ -337,7 +337,7 @@ class MusicTheory(object):
         """
         diff = (note_id - MusicTheory.MIDI_C_NOTE) % MusicTheory.MIDI_C_NOTE
         if with_octaves == False:
-            return MusicTheory.SOUND_FLATS[diff] if use_flat else self.sound_sharps[diff]
+            return MusicTheory.SOUND_FLATS[diff] if use_flat else self.SOUND_SHARPS[diff]
         else:
             return MusicTheory.SOUND_FLATS[diff] + str(int(round(note_id / 12, 0))) if use_flat else MusicTheory.SOUND_SHARPS[diff] + str(int(round(note_id / 12, 0)))
 
