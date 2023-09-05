@@ -148,14 +148,14 @@ class MusicTheory(object):
     def __create_base_scale_notes(self, base_midi_note_id: str, base_scale: []) -> []:
         base_scale_notes = []
         base_scale_notes.append(base_midi_note_id)
-        base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, x in enumerate(base_scale) if idx < len(base_scale) - 1]
+        base_scale_notes_further = [base_midi_note_id + sum(base_scale[:idx + 1]) for idx, _ in enumerate(base_scale) if idx < len(base_scale) - 1]
         base_scale_notes.extend(base_scale_notes_further)
         return base_scale_notes
     
 
     def __create_final_scale_notes(self, scales: [], base_scale_notes: [], starting_sequence: int = 0, alternate_sequence: bool = True):
         final_scale_notes = []
-        for idx, a in enumerate(scales):
+        for idx, _ in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
                 final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:4]))
                 final_scale_notes.append(base_scale_notes[idx] + sum(scales[idx][:2]))
@@ -186,11 +186,12 @@ class MusicTheory(object):
                 inversion = self.__get_note_octave(chord_details[2])
             else: # we have a chord shape
                 shape = chord_details[1]
+        #TODO: default case? error if len is not 2 or 3?
 
         return self.__get_chord(self, scale, base_note, inversion, shape)
 
 
-    def __get_chord(self, scale='major', base_note= 'C1', inversion=0, shape = 'major', add_bass = False, bass_degree = 1):
+    def __get_chord(self, scale = 'major', base_note = 'C1', inversion = 0, shape = 'major', add_bass = False, bass_degree = 1):
         """Returns a list of chord sounds for a scale and base note."""
         base_note_id = self.__get_midi_note_id(base_note)
 
@@ -201,9 +202,9 @@ class MusicTheory(object):
         if len(scale_notes) == 0:
             return []
         else:
-            degrees, alteration = self.__get_chord_shapes(shape)
-            chord = [scale_notes[a - 1] for a in degrees]
-            chord = [a + alteration[idx] for idx, a in enumerate(chord)]
+            degrees, alterations = self.__get_chord_shapes(shape)
+            chord = [scale_notes[degree - 1] for degree in degrees]
+            chord = [note + alterations[idx] for idx, note in enumerate(chord)]
 
         if inversion == 1:
             chord[0] += MusicTheory.MIDI_C_NOTE
@@ -226,15 +227,15 @@ class MusicTheory(object):
     def __get_chord_shapes(self, shape):
         """Returns a list of what degrees and what alterations a chord has."""
         try:
-            degrees = [self.__get_note_octave(x) for x in MusicTheory.CHORD_SHAPES[shape]]
             alterations = []
-            alt = [self.__get_note_base(x) for x in MusicTheory.CHORD_SHAPES[shape]]
-            for a in alt:
-                if a == '':
+            alteration = [self.__get_note_base(note) for note in MusicTheory.CHORD_SHAPES[shape]]
+            degrees = [self.__get_note_octave(note) for note in MusicTheory.CHORD_SHAPES[shape]]
+            for alt in alteration:
+                if alt == '':
                     alterations.append(0)
-                if a == 'b': # flat
+                if alt == 'b': # flat
                     alterations.append(-1)
-                if a == '#': # sharp
+                if alt == '#': # sharp
                     alterations.append(1)
             return degrees, alterations
         except IndexError:
@@ -246,13 +247,13 @@ class MusicTheory(object):
     def __get_scale(self, scale, base_note = 60, octaves = 1, close_with_base = False, reverse = False):
         """Returns a list of notes for a scale."""
         try:
-            degrees = [x['scale'] for i, x in MusicTheory.CHORD_FAMILIES.items() if i == scale][0]
+            degrees = [chord_family[MusicTheory.PROPERTY_SCALE] for i, chord_family in MusicTheory.CHORD_FAMILIES.items() if i == scale][0]
             if octaves > 1:
                 result = []
-                for o in range(octaves):
-                    result += self.__get_scale(scale, base_note + (MusicTheory.MIDI_C_NOTE * o), 1, close_with_base, reverse)
+                for octave in range(octaves):
+                    result += self.__get_scale(scale, base_note + (MusicTheory.MIDI_C_NOTE * octave), 1, close_with_base, reverse)
             else:
-                result = [base_note + sum(degrees[:i]) for i, x in enumerate(degrees)]
+                result = [base_note + sum(degrees[:i]) for i, _ in enumerate(degrees)]
 
             if close_with_base == True:
                 result.append(base_note + (MusicTheory.MIDI_C_NOTE * octaves))
