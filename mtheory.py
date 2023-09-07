@@ -182,7 +182,7 @@ class MusicTheory(object):
         
         #TODO: could get rid of this function and create the Chord inside __get_chord
         chord = Chord(chord_as_string)
-        return self.__get_chord(chord)
+        return self.__get_chord(chord, scale)
 
 
 #TODO:----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ class MusicTheory(object):
 
     # def __get_chord(self, scale = 'major', base_note = 'C1', inversion = 0, shape = 'major', add_bass = False, bass_degree = 1):
     #TODO: handle bass scale separately
-    def __get_chord(self, chord: Chord, add_bass = False, bass_degree = 1):
+    def __get_chord(self, chord: Chord, scale: str = 'major', add_bass = False, bass_degree = 1):
         """Returns a list of chord sounds for a scale and base note."""
         base_note_id = self.__get_midi_note_id(chord.base_note)
 
