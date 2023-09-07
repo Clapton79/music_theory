@@ -8,6 +8,7 @@ from chord import Chord
 
 class MusicTheory(object):
 
+    #TODO: make this two arrays into a single one with tuples (index, value), would that work?
     SOUND_SHARPS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#','A', 'A#', 'B']
     SOUND_FLATS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
