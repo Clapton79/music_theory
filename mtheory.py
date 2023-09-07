@@ -181,6 +181,8 @@ class MusicTheory(object):
         scale = 'major' #TODO: is this a parameter?
         
         #TODO: could get rid of this function and create the Chord inside __get_chord
+        #TODO: in the original implementation, the 'scale' stays at the default 'major', if the chord string contains an inversion
+        #      but I use the 'shape' for similar reason in the Chord class (which is probably a bad idea...)
         chord = Chord(chord_as_string)
         return self.__get_chord(chord, scale)
 
