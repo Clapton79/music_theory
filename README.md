@@ -11,7 +11,7 @@ progressions.
 | package      | method                | description                                                                                                               | remark     |
 | ------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------- |
 | music_theory | explore_scale         | Explores a chord family by playing triads (alternating or not) in a descending or ascending fashion.                      | public     |
-|              | \_get_chord_info      | Breaks down a chord into parts, then looks up its notes.                                                                  | private    |
+|              | get_chord_info        | Breaks down a chord into parts, then looks up its notes. eg. input: 'F# min7b5 inv1'.                                     | private    |
 |              | \_get_chord           | Returns a list of chord sounds for a scale and base note.                                                                 | private    |
 |              | \_get_chord_shapes    | Returns a list of what degrees and what alterations a chord has.                                                          | private    |
 |              | \_get_scale           | Returns a list of notes for a scale.                                                                                      | private    |

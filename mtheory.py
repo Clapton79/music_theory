@@ -4,6 +4,7 @@ import regex as re
 from typing import Tuple, List
 
 from scaleorder import ScaleOrder
+from chord import Chord
 
 class MusicTheory(object):
 
@@ -116,7 +117,7 @@ class MusicTheory(object):
 
         # get each relevant chord family by a main chord family
         filtered_chord_families = [MusicTheory.CHORD_FAMILIES[key] for key in MusicTheory.CHORD_FAMILIES if MusicTheory.CHORD_FAMILIES[key][MusicTheory.PROPERTY_MAIN_FAMILY] == main_chord_family]
-        final_scale_semitones = self.__create_scale_semitones(filtered_chord_families, starting_sequence, alternate_sequence, scale_order)
+        final_scale_semitones = self.__create_semitone_scales(filtered_chord_families, starting_sequence, alternate_sequence, scale_order)
 
         #TODO: we should not create the list of MIDI note IDs at this point, only the scale [now we loose the sharp/flat part too],
         # and have a separate class to convert it to MIDI notes
@@ -125,24 +126,24 @@ class MusicTheory(object):
         return final_scale_notes
 
 
-    def __create_scale_semitones(self, filtered_chord_families: [], starting_sequence: int = 0, alternate_sequence: bool = True,scale_order: ScaleOrder = ScaleOrder.ASCENDING):
+    def __create_semitone_scales(self, filtered_chord_families: [], starting_sequence: int = 0, alternate_sequence: bool = True,scale_order: ScaleOrder = ScaleOrder.ASCENDING):
         base_scale = []     # represents the intervals between notes in the base scale
         scales = []         # each scale for chords in a main chord family
         base_scale, scales = self.__get_base_scale_and_scales(filtered_chord_families, scale_order)
         #TODO: what happens if there is no scales with degree == 1?
-        base_scale_semitones = self.__create_base_scale_semitones(base_scale)
+        base_semitone_scale = self.__create_base_semitone_scale(base_scale)
 
-        final_scale_semitones = []
+        final_semitone_scales = []
         for idx, _ in enumerate(scales):
             if alternate_sequence == True and idx % 2 == starting_sequence: # make this descending
-                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:4]))
-                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:2]))
-                final_scale_semitones.append(base_scale_semitones[idx])
+                final_semitone_scales.append(base_semitone_scale[idx] + sum(scales[idx][:4]))
+                final_semitone_scales.append(base_semitone_scale[idx] + sum(scales[idx][:2]))
+                final_semitone_scales.append(base_semitone_scale[idx])
             else:
-                final_scale_semitones.append(base_scale_semitones[idx])
-                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:2]))
-                final_scale_semitones.append(base_scale_semitones[idx] + sum(scales[idx][:4]))
-        return final_scale_semitones
+                final_semitone_scales.append(base_semitone_scale[idx])
+                final_semitone_scales.append(base_semitone_scale[idx] + sum(scales[idx][:2]))
+                final_semitone_scales.append(base_semitone_scale[idx] + sum(scales[idx][:4]))
+        return final_semitone_scales
 
 
     def __get_base_scale_and_scales(self, filtered_chord_families: [], scale_order: ScaleOrder = ScaleOrder.ASCENDING) -> Tuple[List[int], List[str]]:
@@ -163,62 +164,60 @@ class MusicTheory(object):
         return base_scale, scales
 
 
-    def __create_base_scale_semitones(self, base_scale: []) -> []:
-        base_scale_semi_tones = [sum(base_scale[0:idx]) for idx, _ in enumerate(base_scale)]
-        return base_scale_semi_tones
+    def __create_base_semitone_scale(self, base_scale: []) -> []:
+        base_semitone_scale = [sum(base_scale[:idx]) for idx, _ in enumerate(base_scale)]
+        return base_semitone_scale
 
 
-    def __get_chord_info(self, chord):
-        """Breaks down a chord into parts, then looks up its notes."""
-        chord_details = chord.split(' ')
+    def get_chord_info(self, chord_as_string: str):
+        """
+        Breaks down a chord into parts, then looks up its notes.
+        eg. input: 'F# min7b5 inv1'
+        """
         #defaults
-        shape = 'major'
-        scale = 'major'
-        inversion = 0
-        base_note = chord_details[0]
-
-        if len(chord_details) == 2:         # chord with alteration OR inversion
-            if 'inv' in chord_details[1]:
-                inversion = self.__get_note_octave(chord_details[1])
-            else: # we have a chord shape
-                shape = chord_details[1]
-        elif len(chord_details) == 3:       # chord with alteration AND inversion
-            if 'inv' in chord_details[2]:
-                inversion = self.__get_note_octave(chord_details[2])
-            else: # we have a chord shape
-                shape = chord_details[1]
-        #TODO: default case? error if len is not 2 or 3?
-
-        return self.__get_chord(self, scale, base_note, inversion, shape)
+        #TODO: base_note default is C1? -> see __get_chord(...) parameters
+        #TODO: inversion default is 0? -> see __get_chord(...) parameters
+        shape = 'major' #TODO: make it a fallback value if chord shape property is None in the Chord instance
+        scale = 'major' #TODO: is this a parameter?
+        
+        #TODO: could get rid of this function and create the Chord inside __get_chord
+        chord = Chord(chord_as_string)
+        return self.__get_chord(self, chord)
 
 
-    def __get_chord(self, scale = 'major', base_note = 'C1', inversion = 0, shape = 'major', add_bass = False, bass_degree = 1):
+#TODO:----------------------------------------------------------------------------
+
+
+    # def __get_chord(self, scale = 'major', base_note = 'C1', inversion = 0, shape = 'major', add_bass = False, bass_degree = 1):
+    #TODO: handle bass scale separately
+    def __get_chord(self, chord: Chord, add_bass = False, bass_degree = 1):
         """Returns a list of chord sounds for a scale and base note."""
-        base_note_id = self.__get_midi_note_id(base_note)
+        base_note_id = self.__get_midi_note_id(chord.base_note)
 
-        if inversion > 3 or inversion < 0:
+        if chord.inversion < 0 or 3 < chord.inversion:
             raise ValueError('Invalid inversion')
-        scale_notes = self.__get_scale(scale, base_note_id, 2)
+        scale_notes = self.__get_scale(chord, base_note_id, 2)
 
         if len(scale_notes) == 0:
             return []
         else:
-            degrees, alterations = self.__get_chord_shapes(shape)
+            degrees, alterations = self.__get_chord_shapes(chord.shape)
             chord = [scale_notes[degree - 1] for degree in degrees]
             chord = [note + alterations[idx] for idx, note in enumerate(chord)]
 
-        if inversion == 1:
+        if chord.inversion == 1:
             chord[0] += MusicTheory.MIDI_C_NOTE
-        elif inversion == 2:
+        elif chord.inversion == 2:
             chord[0] += MusicTheory.MIDI_C_NOTE
             chord[1] += MusicTheory.MIDI_C_NOTE
+        #TODO: what about 3rd inversion?
 
         if add_bass:
             bass_note_id = base_note_id - MusicTheory.MIDI_C_NOTE    # bass note defaults to an octave lower
             if bass_degree == 1:
                 bass_note_id = base_note_id - MusicTheory.MIDI_C_NOTE
             else:
-                bass_scale = self.__get_scale(scale, bass_note_id)
+                bass_scale = self.__get_scale(chord.scale, bass_note_id)
                 bass_note_id = bass_scale[bass_degree - 1]
             chord.append(bass_note_id)
 
