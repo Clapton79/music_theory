@@ -198,7 +198,7 @@ class MusicTheory(object):
             raise ValueError('Invalid inversion')
 
         #TODO: why the default octave 2?
-        scale_notes = self.__get_scale(chord.shape, base_note_id, 2)
+        scale_notes = self.__get_scale(scale, base_note_id, 2)
         if len(scale_notes) == 0:
             return []
 
@@ -218,7 +218,7 @@ class MusicTheory(object):
             if bass_degree == 1:
                 bass_note_id = base_note_id - MusicTheory.MIDI_C_NOTE
             else:
-                bass_scale = self.__get_scale(chord.scale, bass_note_id)
+                bass_scale = self.__get_scale(scale, bass_note_id)
                 bass_note_id = bass_scale[bass_degree - 1]
             chord_notes.append(bass_note_id)
 
