@@ -182,7 +182,7 @@ class MusicTheory(object):
         
         #TODO: could get rid of this function and create the Chord inside __get_chord
         chord = Chord(chord_as_string)
-        return self.__get_chord(self, chord)
+        return self.__get_chord(chord)
 
 
 #TODO:----------------------------------------------------------------------------
@@ -196,20 +196,21 @@ class MusicTheory(object):
 
         if chord.inversion < 0 or 3 < chord.inversion:
             raise ValueError('Invalid inversion')
-        scale_notes = self.__get_scale(chord, base_note_id, 2)
 
+        #TODO: why the default octave 2?
+        scale_notes = self.__get_scale(chord.shape, base_note_id, 2)
         if len(scale_notes) == 0:
             return []
-        else:
-            degrees, alterations = self.__get_chord_shapes(chord.shape)
-            chord = [scale_notes[degree - 1] for degree in degrees]
-            chord = [note + alterations[idx] for idx, note in enumerate(chord)]
+
+        degrees, alterations = self.__get_chord_shapes(chord.shape)
+        chord_notes = [scale_notes[degree - 1] for degree in degrees]
+        chord_notes = [note + alterations[idx] for idx, note in enumerate(chord_notes)]
 
         if chord.inversion == 1:
-            chord[0] += MusicTheory.MIDI_C_NOTE
+            chord_notes[0] += MusicTheory.MIDI_C_NOTE
         elif chord.inversion == 2:
-            chord[0] += MusicTheory.MIDI_C_NOTE
-            chord[1] += MusicTheory.MIDI_C_NOTE
+            chord_notes[0] += MusicTheory.MIDI_C_NOTE
+            chord_notes[1] += MusicTheory.MIDI_C_NOTE
         #TODO: what about 3rd inversion?
 
         if add_bass:
@@ -219,9 +220,9 @@ class MusicTheory(object):
             else:
                 bass_scale = self.__get_scale(chord.scale, bass_note_id)
                 bass_note_id = bass_scale[bass_degree - 1]
-            chord.append(bass_note_id)
+            chord_notes.append(bass_note_id)
 
-        return sorted(chord)
+        return sorted(chord_notes)
 
 
     def __get_chord_shapes(self, shape):
@@ -244,10 +245,11 @@ class MusicTheory(object):
             return [], []
 
 
-    def __get_scale(self, scale, base_note = 60, octaves = 1, close_with_base = False, reverse = False):
+    def __get_scale(self, scale: str, base_note: int = 60, octaves: int = 1, close_with_base = False, reverse = False):
         """Returns a list of notes for a scale."""
         try:
-            degrees = [chord_family[MusicTheory.PROPERTY_SCALE] for i, chord_family in MusicTheory.CHORD_FAMILIES.items() if i == scale][0]
+            asd = [chord_family[MusicTheory.PROPERTY_SCALE] for key, chord_family in MusicTheory.CHORD_FAMILIES.items() if key == scale]
+            degrees = asd[0]
             if octaves > 1:
                 result = []
                 for octave in range(octaves):

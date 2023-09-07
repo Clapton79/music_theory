@@ -15,7 +15,7 @@ class Chord:
             if not chord_parts[1].startswith("inv"):
                 self.shape = chord_parts[1]
             if chord_parts[-1].startswith("inv"):
-                self.inversion = chord_parts[-1][-1] # last char of last item
+                self.inversion = int(chord_parts[-1][-1]) # last char of last item
 
 
     def __str__(self):
@@ -25,20 +25,20 @@ class Chord:
 # chord = Chord(" ")# error
 # print(f"'{chord}'")
 
-chord = Chord("C")
-print(f"'{chord}'")
+# chord = Chord("C")
+# print(f"'{chord}'")
 
-chord = Chord(" C ")
-print(f"'{chord}'")
+# chord = Chord(" C ")
+# print(f"'{chord}'")
 
-chord = Chord("C major")
-print(f"'{chord}'")
+# chord = Chord("C major")
+# print(f"'{chord}'")
 
-chord = Chord("F# min7b5")
-print(f"'{chord}'")
+# chord = Chord("F# min7b5")
+# print(f"'{chord}'")
 
-chord = Chord("G7 inv2")
-print(f"'{chord}'")
+# chord = Chord("G7 inv2")
+# print(f"'{chord}'")
 
-chord = Chord("F# min7b5 inv1")
-print(f"'{chord}'")
+# chord = Chord("F# min7b5 inv1")
+# print(f"'{chord}'")
